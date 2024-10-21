@@ -67,9 +67,10 @@ docker_menu() {
         echo -e "${BLUE}6)${NC} 删除镜像"
         echo -e "${BLUE}7)${NC} 部署 Pixman 应用"
         echo -e "${BLUE}8)${NC} 删除 Pixman 应用"
-        echo -e "${BLUE}9)${NC} 部署 Allinone 应用"
-        echo -e "${BLUE}10)${NC} 删除 Allinone 应用"
-        echo -e "${BLUE}11)${NC} 设置自动更新 Docker 镜像"
+        echo -e "${BLUE}9)${NC} Pixman 应用 Mytvsuper 生成静态 m3u"
+        echo -e "${BLUE}10)${NC} 部署 Allinone 应用"
+        echo -e "${BLUE}11)${NC} 删除 Allinone 应用"
+        echo -e "${BLUE}12)${NC} 设置自动更新 Docker 镜像"
         echo -e "${RED}0)${NC} 返回主菜单"
         echo
 
@@ -102,12 +103,15 @@ docker_menu() {
                 remove_pixman
                 ;;
             9)
-                deploy_allinone
+                generate_mytvsuper_m3u
                 ;;
             10)
-                remove_allinone
+                deploy_allinone
                 ;;
             11)
+                remove_allinone
+                ;;
+            12)
                 setup_auto_update
                 ;;
             0)
@@ -221,7 +225,7 @@ install_nezha() {
 
 install_aapanel() {
     echo -e "${GREEN}开始装 aaPanel...${NC}"
-    echo -e "${YELLOW}警告：此操作将直接从网络下载并执行脚本。请确保您信任该脚本的来源。${NC}"
+    echo -e "${YELLOW}警告：此操作将直接从网络下并执行脚本。请确保您信任该脚本的来源。${NC}"
     wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh
     bash install.sh aapanel
     echo -e "${GREEN}aaPanel 安装脚本执行完成${NC}"
@@ -327,6 +331,26 @@ deploy_pixman() {
     fi
 
     echo -e "${GREEN}Pixman 应用部署完成。容器正在后台运行，端口为 $port${NC}"
+    
+    # 获取当前服务器的 IP 地址
+    server_ip=$(curl -s ipinfo.io/ip)
+    
+    echo -e "\n${YELLOW}以下是可用的直播源链接：${NC}"
+    echo -e "${CYAN}四季線上 4GTV:${NC} http://${server_ip}:${port}/4gtv.m3u"
+    echo -e "${CYAN}江苏移动魔百盒 TPTV:${NC}"
+    echo "http://${server_ip}:${port}/tptv.m3u"
+    echo "http://${server_ip}:${port}/tptv_proxy.m3u"
+    echo -e "${CYAN}央视频直播源:${NC} http://${server_ip}:${port}/ysp.m3u"
+    echo -e "${CYAN}MytvSuper 直播源:${NC} http://${server_ip}:${port}/mytvsuper.m3u"
+    echo -e "${CYAN}Beesport 直播源:${NC} http://${server_ip}:${port}/beesport.m3u"
+    echo -e "${CYAN}中国移动 iTV 平台:${NC}"
+    echo "http://${server_ip}:${port}/itv.m3u"
+    echo "http://${server_ip}:${port}/itv_proxy.m3u"
+    echo -e "${CYAN}TheTV:${NC} http://${server_ip}:${port}/thetv.m3u"
+    echo -e "${CYAN}Hami Video:${NC} http://${server_ip}:${port}/hami.m3u"
+    echo -e "${CYAN}DLHD:${NC} http://${server_ip}:${port}/dlhd.m3u"
+    
+    echo -e "\n${YELLOW}请保存这些链接以便后续使用。${NC}"
     read -p "按回车键继续..."
 }
 
@@ -520,6 +544,37 @@ setup_auto_update() {
     (crontab -l 2>/dev/null; echo "$cron_schedule $update_script") | crontab -
 
     echo -e "${GREEN}自动更新已设置。$app_name 将$freq_text凌晨4点自动更新。使用端口: $port${NC}"
+    read -p "按回车键继续..."
+}
+
+generate_mytvsuper_m3u() {
+    echo -e "${GREEN}开始生成 Mytvsuper 静态 m3u...${NC}"
+    docker exec pixman sh -c 'flask mytvsuper_tivimate'
+    
+    # 获取当前服务器的 IP 地址
+    server_ip=$(curl -s ipinfo.io/ip)
+    
+    # 获取 Pixman 应用的端口
+    pixman_port=$(docker port pixman 5000 | cut -d ':' -f 2)
+    
+    echo -e "${GREEN}Mytvsuper 静态 m3u 生成完成${NC}"
+    echo -e "${YELLOW}请使用 http://${server_ip}:${pixman_port}/mytvsuper-tivimate.m3u 订阅${NC}"
+    echo -e "${YELLOW}注意：生成的Mytvsuper链接有效期为 24 小时${NC}"
+    
+    read -p "是否需要添加每24小时自动执行一次的任务？(y/n): " auto_task
+    if [[ $auto_task == [yY] ]]; then
+        # 创建自动执行脚本
+        auto_script="/usr/local/bin/generate_mytvsuper_m3u.sh"
+        echo '#!/bin/bash' > $auto_script
+        echo "docker exec pixman sh -c 'flask mytvsuper_tivimate'" >> $auto_script
+        chmod +x $auto_script
+        
+        # 添加 cron 任务
+        (crontab -l 2>/dev/null; echo "0 */24 * * * $auto_script") | crontab -
+        
+        echo -e "${GREEN}自动执行任务已添加，每 24 小时执行一次${NC}"
+    fi
+    
     read -p "按回车键继续..."
 }
 
