@@ -1,90 +1,78 @@
-AI代写
-整合了一些我常的程序安装脚本，特别优化了 Pixman 应用的部署、删除和自动更新流程。
-基本上能完美的解决小白用户安装部署作者的 Pixman 遇到的所有问题，如果还有遗漏可以留言或者TG联络我补充。
+# Linux 工具箱脚本 
 
-![](https://img.pixman.cloud/photo/lolee/8153092b-7bba-4db7-929e-bbeeab7f5da1.png?x-oss-process=image%2Fresize%2Cw_1920)
+### 版本: 1.1
 
-![](https://img.pixman.cloud/photo/lolee/f91d8258-5227-46a4-aa78-994aabe0bba2.png?x-oss-process=image%2Fresize%2Cw_1920)
+这是一个为Linux服务器（特别是新购买的VPS）设计的强大而全面的多功能管理脚本。它将众多常用功能集于一身，通过一个简洁的交互式菜单，帮助您一键完成系统维护、应用部署、Docker管理和网络检测等复杂操作，无需再四处寻找各种零散的脚本。
 
-![](https://img.pixman.cloud/photo/lolee/77acf0e5-a04a-4cf7-9eee-2a327cc65ef4.png?x-oss-process=image%2Fresize%2Cw_1920)
+## ✨ 主要特性
 
+*   **一站式管理**: 一个脚本，满足您从系统初始化到应用部署的绝大多数需求。
+*   **交互式菜单**: 界面友好，通过数字选择即可执行相应功能，对新手极其友好。
+*   **智能与健壮**: 自动识别系统发行版、智能处理网络下载失败（如GitHub连接问题）等情况。
+*   **功能全面**: 精心集成了数十个高质量、经过验证的实用功能。
 
-一键脚本
+## 🛠️ 功能列表
 
-```
+脚本主要分为四大模块，覆盖了服务器管理的方方面面：
+
+#### 1. 系统工具与维护
+
+*   **更新系统**: 自动识别 Debian/Ubuntu/CentOS 等系统并执行更新。
+*   **同步时间**: 一键将服务器时间同步为北京时间（Asia/Shanghai）。
+*   **BBR加速**: 安装最新的 BBR/BBR Plus 内核，优化网络性能。
+*   **安装 FFmpeg**: 快速安装 FFmpeg 多媒体处理工具。
+*   **查看计划任务**: 方便地列出当前用户的 `crontab` 计划任务。
+
+#### 2. 面板与应用安装
+
+*   **X-UI / 3X-UI**: 快速部署流行的代理面板。
+*   **Gost**: 安装强大的安全隧道工具。
+*   **哪吒监控**: 一键安装哪吒监控的 Agent 端。
+*   **aaPanel / 宝塔面板**: 提供国际版和“开心版”宝塔面板的安装选项。
+*   **frp**: 快速部署 frp 内网穿透服务。
+
+#### 3. Docker 管理
+
+*   **安装 Docker & Docker-Compose**: 自动化安装和配置 Docker 环境。
+*   **镜像/容器管理**: 方便地查看和删除镜像与容器。
+*   **自动更新**: 一键部署 Watchtower，实现所有 Docker 容器的自动更新。
+
+#### 4. 网络与IP工具
+
+*   **查看IP信息**: 使用 `ipinfo.io` 获取当前服务器公网IP的详细地理位置和ISP信息。
+*   **Netflix解锁检查**: 调用 `sjlleo/netflix-verify` 工具，准确测试 Netflix 解锁情况。
+*   **DDNS设置**: 使用一键脚本快速设置动态DNS。
+
+## 🚀 如何使用
+
+您只需要一行命令即可开始使用。打开您的服务器终端，复制并执行以下命令：
+
+```bash
 bash <(curl -s https://raw.githubusercontent.com/chinggirltube/install_script/refs/heads/main/install_script.sh)
 ```
 
+## 📖 菜单概览
 
+运行脚本后，您会看到一个清爽的主菜单：
 
-## 主要功能
+```
+=============== 主菜单 ===============
+1) 系统工具与维护
+2) 面板与应用安装
+3) Docker 管理
+4) 网络与IP工具
+0) 退出脚本
+```
 
-1. Docker 管理（包括 Pixman应用）
-2. X-UI 安装
-3. 3X-UI 安装
-4. BBR 加速安装
-5. 哪吒监控安装
-6. aaPanel 安装
-7. IP 质量检测
-8. frp 内网穿透
-9. Netflix 解锁检查
-10. 本机 IP 信息查看
+您只需输入对应的数字并按回车，即可进入相应的子菜单或执行操作。每个功能执行完毕后，都会有清晰的提示，并等待您按任意键返回菜单，操作流程非常顺畅。
 
-## Pixman 相关功能
+## ⚠️ 重要声明
 
-### 部署 Pixman
+*   本脚本集成了多个来自开源社区的第三方脚本。我们对这些脚本的稳定性和安全性进行了基础筛选，但无法保证其永远有效或绝对安全。
+*   脚本中的“宝塔开心版”为第三方修改版本，可能存在未知风险，请谨慎在生产环境中使用。
+*   请在执行任何可能影响系统配置的操作（如BBR安装、面板安装）前，确保您已了解其作用，并建议做好数据备份。
+*   使用者需自行承担因使用本脚本而可能导致的一切后果。
 
-1. 在主菜单中选择 "1) Docker 管理"
-2. 在 Docker 管理菜单中选择 "7) 部署 Pixman 应用"
-3. 根据提示选择系统架构（x86 或 ARM/v7）
-4. 设置运行端口（默认 5000）
-5. 根据需要设置 MYTVSUPER TOKEN 和 Hamivideo 相关信息
-6. 部署完成后，脚本会显示所有可用的直播源链接
+---
 
-### 删除 Pixman
-
-1. 在主菜单中选择 "1) Docker 管理"
-2. 在 Docker 管理菜单中选择 "8) 删除 Pixman 应用"
-3. 根据提示选择系统架构（x86 或 ARM/v7）
-
-### Pixman 应用 Mytvsuper 生成静态 m3u
-
-1. 在主菜单中选择 "1) Docker 管理"
-2. 在 Docker 管理菜单中选择 "9) Pixman 应用 Mytvsuper 生成静态 m3u"
-3. 脚本会生成 Mytvsuper 静态 m3u 并显示订阅链接
-4. 可选择是否添加每24小时自动执行一次的任务
-
-### 设置 Pixman 自动更新
-
-1. 在主菜单中选择 "1) Docker 管理"
-2. 在 Docker 管理菜单中选择 "12) 设置自动更新 Docker 镜像"
-3. 选择 "1) Pixman"
-4. 选择 Pixman 的架构（x86 或 ARM/v7）
-5. 输入当前运行的端口
-6. 选择更新频率（每天、每2天或每周）
-
-## Pixman 可用直播源
-
-部署 Pixman 后，会提示以下直播源链接
-
-- 四季線上 4GTV: `http://ip:port/4gtv.m3u`
-- 江苏移动魔百盒 TPTV: 
-  - `http://ip:port/tptv.m3u`
-  - `http://ip:port/tptv_proxy.m3u`
-- 央视频直播源: `http://ip:port/ysp.m3u`
-- MytvSuper 直播源: `http://ip:port/mytvsuper.m3u`
-- Beesport 直播源: `http://ip:port/beesport.m3u`
-- 中国移动 iTV 平台:
-  - `http://ip:port/itv.m3u`
-  - `http://ip:port/itv_proxy.m3u`
-- TheTV: `http://ip:port/thetv.m3u`
-- Hami Video: `http://ip:port/hami.m3u`
-- DLHD: `http://ip:port/dlhd.m3u`
-
-## 注意事项
-
-- 使用前请确保您的系统已经安装了 curl
-- 部分功能可能需要稳定的网络连接
-- 请在使用前备份重要数据
-
-
+祝您使用愉快！
